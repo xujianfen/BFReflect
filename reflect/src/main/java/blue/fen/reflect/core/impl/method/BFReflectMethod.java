@@ -5,6 +5,8 @@ import androidx.annotation.Nullable;
 
 import java.lang.reflect.Method;
 
+import blue.fen.reflect.arena.method.MethodArena;
+import blue.fen.reflect.arena.param.ParamPlayer;
 import blue.fen.reflect.core.interfaces.method.IBFMethod;
 
 /**
@@ -30,8 +32,15 @@ public class BFReflectMethod implements IBFMethod {
             clazz = object.getClass();
         }
 
-        Method method = find(clazz, name, getClassList(parameters));
-        return method.invoke(object, parameters);
+        ParamPlayer<Method> player = new MethodArena(clazz, name, parameters).start();
+
+        Method method = player.getSite();
+
+        if (player.isArray()) {
+            return method.invoke(object, (Object[]) player.getArguments());
+        } else {
+            return method.invoke(object, player.getArguments());
+        }
     }
 
     @NonNull
@@ -41,25 +50,6 @@ public class BFReflectMethod implements IBFMethod {
         checkName(name);
 
         return clazz.getMethod(name, parameterTypes);
-    }
-
-    /**
-     * 获取{@code objects}对应的类型数组
-     */
-    public static Class<?>[] getClassList(Object... objects) {
-        if (objects == null || objects.length == 0) return null;
-
-        Class<?>[] classes = new Class[objects.length];
-
-        for (int i = 0; i < objects.length; i++) {
-            if (objects[i] != null) {
-                classes[i] = objects[i].getClass();
-            } else {
-                return null;
-            }
-        }
-
-        return classes;
     }
 
     private void checkName(String name) throws IllegalArgumentException {
