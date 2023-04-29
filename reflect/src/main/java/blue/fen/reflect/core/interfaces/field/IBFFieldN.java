@@ -1,0 +1,45 @@
+package blue.fen.reflect.core.interfaces.field;
+
+import androidx.annotation.Nullable;
+
+import java.lang.reflect.Field;
+
+/**
+ * 项目名：BFReflect <br/>
+ * 包名：blue.fen.reflect.reflect.interfaces <br/>
+ * 创建时间：2023/4/29 01:19 （星期六｝ <br/>
+ * 作者： blue_fen
+ * <p>
+ * 描述：属性反射接口 (不会抛出异常)
+ */
+public interface IBFFieldN {
+    /**
+     * 修改待处理对象的属性内容
+     *
+     * @param object 待处理对象，若为 {@link Class}类型，则视为调用状态字段
+     * @param name   待修改字段的名称
+     * @param value  要修改新值
+     * @return 若修改成功，则返回true，否则返回false
+     */
+    boolean setN(Object object, String name, Object value);
+
+    /**
+     * 获取待处理对象的属性内容
+     *
+     * @param object 待处理对象，若为 {@link Class}类型，则视为调用状态字段
+     * @param name   待获取字段的名称
+     * @return 若获取成功，则返回字段的内容；如果字段未找到或者字段获取失败则返回null
+     */
+    @Nullable
+    Object getN(Object object, String name);
+
+    /**
+     * 查找待处理对象的属性
+     *
+     * @param clazz 待反射属性的持有类
+     * @param name  查找字段的名称
+     * @return 查找成功返回字段类型，否则返回null
+     */
+    @Nullable
+    Field findN(Class<?> clazz, String name);
+}
