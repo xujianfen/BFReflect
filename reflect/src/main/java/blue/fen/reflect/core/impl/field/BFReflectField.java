@@ -58,7 +58,21 @@ public class BFReflectField implements IBFField {
         checkClass(clazz);
         checkName(name);
 
-        return clazz.getField(name);
+        Class<?> source = clazz;
+
+        while (clazz != Object.class && clazz != null) {
+            try {
+                Field field = clazz.getDeclaredField(name);
+                //跳过权限检查
+                field.setAccessible(true);
+                return field;
+            } catch (NoSuchFieldException ignored) {
+            }
+
+            clazz = clazz.getSuperclass();
+        }
+
+        throw new NoSuchFieldException(source.getCanonicalName() + "未找到[" + name + "]属性");
     }
 
     private void checkName(String name) throws IllegalArgumentException {
