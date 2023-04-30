@@ -5,7 +5,7 @@ import androidx.annotation.Nullable;
 import java.lang.reflect.Method;
 
 import blue.fen.reflect.arena.Player;
-import blue.fen.reflect.param.matching.priority.MatchingPriority;
+import blue.fen.reflect.param.matching.priority.PriorityProvider;
 import blue.fen.reflect.param.model.ParamProvider;
 
 /**
@@ -37,14 +37,14 @@ public class ParamPlayer<T> extends Player {
     }
 
     /**
-     * 注意选手分数{@link Player#score}值，在该类将用 {@link MatchingPriority}来处理
+     * 注意选手分数{@link Player#score}值，在该类将用 {@link PriorityProvider}来处理
      *
      * @param site       竞技场地点
      * @param paramTypes 方法的形参类型数组，该数组长度被设置为{@link Player#programNumber}
      * @param arguments  方法的实参类型数组
      */
     public ParamPlayer(T site, Class<?>[] paramTypes, @Nullable Object... arguments) {
-        super(MatchingPriority.INIT, paramTypes.length);
+        super(PriorityProvider.get().defaultPriority(), paramTypes.length);
 
         this.site = site;
 
@@ -56,7 +56,7 @@ public class ParamPlayer<T> extends Player {
      * PS: 不是最终淘汰，而是在比赛环节中，因为无法匹配，直接被淘汰；没有被淘汰的还要根据最终的分数参与筛选
      */
     public boolean isDieOut() {
-        return getScore() == MatchingPriority.MISMATCH;
+        return PriorityProvider.get().isMismatch(getScore());
     }
 
     private Object arguments = null;

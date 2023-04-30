@@ -50,8 +50,6 @@ public class MatchingPriority {
 
     /**
      * 将过滤器标识转化为分数匹配优先级
-     *
-     * @return 如果过滤器不合法将返回-1
      */
     public static int transformPriority(@MatchingSpec.FilterPriority int filter) {
         switch (filter) {
@@ -66,7 +64,7 @@ public class MatchingPriority {
             case MatchingSpec.ARRAY_WRAPPER_FILTER:
                 return ARRAY_WRAPPER;
             default:
-                return -1;
+                throw new IllegalArgumentException("参数过滤失败，不合法的过滤器: " + filter);
         }
     }
 

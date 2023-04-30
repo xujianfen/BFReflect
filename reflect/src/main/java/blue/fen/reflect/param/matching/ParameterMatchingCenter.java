@@ -3,9 +3,10 @@ package blue.fen.reflect.param.matching;
 import androidx.annotation.NonNull;
 
 import blue.fen.reflect.param.matching.filter.tree.MatchingFilterTree;
-import blue.fen.reflect.param.matching.priority.MatchingPriority;
+import blue.fen.reflect.param.matching.priority.IParamPriority;
 import blue.fen.reflect.param.matching.priority.MatchingSpec;
 import blue.fen.reflect.arena.param.ParamPlayer;
+import blue.fen.reflect.param.matching.priority.PriorityProvider;
 
 /**
  * 项目名：NotebookComponent <br/>
@@ -28,23 +29,21 @@ public class ParameterMatchingCenter {
 
         int result = MatchingFilterTree.getInstance().matching(player.getParamProvider(), count);
 
+        IParamPriority paramPriority = PriorityProvider.get();
+
         if (MatchingSpec.isMatch(result)) {
             int filter = MatchingSpec.getFilter(result);
             int score = MatchingSpec.getScore(result);
 
-            int priority = MatchingPriority.transformPriority(filter);
+            int priority = paramPriority.transformPriority(filter);
+            int newPriority = paramPriority.modifyPriority(player.getScore(), priority, score);
 
-            if (priority < 0) {
-                throw new IllegalArgumentException("参数过滤失败，不合法的过滤器: " + priority);
-            }
-
-            int newPriority = MatchingPriority.modifyPriority(player.getScore(), priority, score);
             player.setScore(newPriority);
             isMatching = true;
         }
 
         if (!isMatching) {
-            player.setScore(MatchingPriority.MISMATCH);
+            player.setScore(paramPriority.mismatchPriority());
         }
     }
 }
