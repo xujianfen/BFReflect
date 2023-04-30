@@ -5,6 +5,7 @@ import androidx.annotation.Nullable;
 
 import java.lang.reflect.Method;
 
+import blue.fen.reflect.BusMessage;
 import blue.fen.reflect.result.IReflectResult;
 import blue.fen.reflect.core.interfaces.IReflectProxy;
 import blue.fen.reflect.result.factory.IReflectResultFactory;
@@ -51,7 +52,8 @@ public class BFMethod implements IBFMethod, IBFMethodN, IBFMethodX, IReflectProx
     public Object invokeN(Object object, String name, Object... parameters) {
         try {
             return getImpl().invoke(object, name, parameters);
-        } catch (Exception ignored) {
+        } catch (Exception exception) {
+            BusMessage.getInstance().sendMessage(BusMessage.N_EXCEPTION, exception);
             return null;
         }
     }
@@ -61,7 +63,8 @@ public class BFMethod implements IBFMethod, IBFMethodN, IBFMethodX, IReflectProx
     public Method findN(Class<?> clazz, String name, Class<?>... parameterTypes) {
         try {
             return getImpl().find(clazz, name, parameterTypes);
-        } catch (Exception ignored) {
+        } catch (Exception exception) {
+            BusMessage.getInstance().sendMessage(BusMessage.N_EXCEPTION, exception);
             return null;
         }
     }

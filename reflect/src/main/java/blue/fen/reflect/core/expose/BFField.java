@@ -5,6 +5,7 @@ import androidx.annotation.Nullable;
 
 import java.lang.reflect.Field;
 
+import blue.fen.reflect.BusMessage;
 import blue.fen.reflect.result.IReflectResult;
 import blue.fen.reflect.core.interfaces.IReflectProxy;
 import blue.fen.reflect.result.factory.IReflectResultFactory;
@@ -56,7 +57,8 @@ public class BFField implements IBFField, IBFFieldN, IBFFieldX, IReflectProxy<IB
         try {
             getImpl().set(object, name, value);
             return true;
-        } catch (Exception ignored) {
+        } catch (Exception exception) {
+            BusMessage.getInstance().sendMessage(BusMessage.N_EXCEPTION, exception);
             return false;
         }
     }
@@ -66,7 +68,8 @@ public class BFField implements IBFField, IBFFieldN, IBFFieldX, IReflectProxy<IB
     public Object getN(Object object, String name) {
         try {
             return getImpl().get(object, name);
-        } catch (Exception ignored) {
+        } catch (Exception exception) {
+            BusMessage.getInstance().sendMessage(BusMessage.N_EXCEPTION, exception);
             return null;
         }
     }
@@ -76,7 +79,8 @@ public class BFField implements IBFField, IBFFieldN, IBFFieldX, IReflectProxy<IB
     public Field findN(Class<?> clazz, String name) {
         try {
             return getImpl().find(clazz, name);
-        } catch (Exception ignored) {
+        } catch (Exception exception) {
+            BusMessage.getInstance().sendMessage(BusMessage.N_EXCEPTION, exception);
             return null;
         }
     }
