@@ -40,13 +40,20 @@ public class MethodArena extends ParamArena<Method> {
 
     @Override
     protected void entryOfPlayers(Class<?> clazz, String name, @Nullable Object... arguments) {
-        Method[] methods = clazz.getDeclaredMethods();
+        int distance = 0;
 
-        for (Method method : methods) {
-            if (method.getName().equals(name)) {
-                Class<?>[] getTypeParameters = method.getParameterTypes();
-                entry(new ParamPlayer<>(method, getTypeParameters, arguments));
+        while (clazz != Object.class && clazz != null) {
+            Method[] methods = clazz.getDeclaredMethods();
+
+            for (Method method : methods) {
+                if (method.getName().equals(name)) {
+                    Class<?>[] getTypeParameters = method.getParameterTypes();
+                    entry(new ParamPlayer<>(method, clazz, distance, getTypeParameters, arguments));
+                }
             }
+
+            clazz = clazz.getSuperclass();
+            distance++;
         }
     }
 

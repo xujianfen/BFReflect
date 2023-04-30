@@ -79,7 +79,7 @@ public abstract class ParamArena<T> extends Arena<ParamPlayer<T>, Object[]> {
     }
 
     /**
-     * 在{@linkplain Arena#electWinner()}方法的基础上，把参数长度短的方法淘汰
+     * 在{@linkplain Arena#electWinner()}方法的基础上，进一步淘汰选手
      */
     @Override
     public List<ParamPlayer<T>> electWinner() {
@@ -89,6 +89,7 @@ public abstract class ParamArena<T> extends Arena<ParamPlayer<T>, Object[]> {
         int pre = -1;
 
         for (int i = size - 1; i >= 0; i--) {
+            //淘汰参数长度短的方法
             int len = winners.get(i).getParamProvider().getParameters().length;
 
             if (len < pre) {
@@ -99,6 +100,27 @@ public abstract class ParamArena<T> extends Arena<ParamPlayer<T>, Object[]> {
                 }
 
                 pre = len;
+            }
+        }
+
+
+        size = winners.size();
+        pre = Integer.MAX_VALUE;
+
+        for (int i = size - 1; i >= 0; i--) {
+            //淘汰持有者辈份较高的方法
+            int level = winners.get(i).getOrganizerLevel();
+
+            if (level > pre) {
+                winners.remove(i);
+            } else if (level < pre) {
+                if (pre < Integer.MAX_VALUE) {
+                    if (size > i + 1) {
+                        winners.subList(i + 1, size).clear();
+                    }
+                }
+
+                pre = level;
             }
         }
 

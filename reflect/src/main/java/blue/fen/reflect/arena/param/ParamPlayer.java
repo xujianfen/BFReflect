@@ -22,6 +22,17 @@ public class ParamPlayer<T> extends Player {
      */
     private final T site;
 
+    /**
+     * 竞技场举办方 (方法/构造方法的持有类)
+     */
+    private final Class<?> organizer;
+
+
+    /**
+     * 竞技场举办方的级别 （{@linkplain ParamPlayer#organizer}与原始持有类的距离）
+     */
+    private final int organizerLevel;
+
     private ParamProvider paramProvider;
 
     public ParamProvider getParamProvider() {
@@ -36,17 +47,28 @@ public class ParamPlayer<T> extends Player {
         return site;
     }
 
+    public Class<?> getOrganizer() {
+        return organizer;
+    }
+
+    public int getOrganizerLevel() {
+        return organizerLevel;
+    }
+
     /**
      * 注意选手分数{@link Player#score}值，在该类将用 {@link PriorityProvider}来处理
      *
+     * @param organizer  竞技场举办方
      * @param site       竞技场地点
      * @param paramTypes 方法的形参类型数组，该数组长度被设置为{@link Player#programNumber}
      * @param arguments  方法的实参类型数组
      */
-    public ParamPlayer(T site, Class<?>[] paramTypes, @Nullable Object... arguments) {
+    public ParamPlayer(T site, Class<?> organizer, int organizerLevel, Class<?>[] paramTypes, @Nullable Object... arguments) {
         super(PriorityProvider.get().defaultPriority(), paramTypes.length);
 
         this.site = site;
+        this.organizer = organizer;
+        this.organizerLevel = organizerLevel;
 
         paramProvider = new ParamProvider(paramTypes, arguments);
     }
