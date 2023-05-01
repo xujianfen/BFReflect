@@ -1,0 +1,144 @@
+apply plugin: 'maven-publish'
+apply plugin: 'signing'
+
+project.ext {
+    String MAVEN_ID
+    String MAVEN_URL
+    String MAVEN_NAME
+    String MAVEN_EMAIL
+    String MAVEN_PASSWORD
+
+    tryGetMavenConfigInfo = {
+        try {
+            Properties properties = new Properties()
+            properties.load(project.rootProject.file('maven/maven.properties').newDataInputStream())
+
+            MAVEN_ID = properties.getProperty('MAVEN_ID')
+            MAVEN_URL = properties.getProperty('MAVEN_URL')
+            MAVEN_NAME = properties.getProperty('MAVEN_NAME')
+            MAVEN_EMAIL = properties.getProperty('MAVEN_EMAIL')
+            MAVEN_PASSWORD = properties.getProperty('MAVEN_PASSWORD')
+
+            println "------------Maven-------------"
+            println "MAVEN_ID = ${MAVEN_ID}"
+            println "MAVEN_URL = ${MAVEN_URL}"
+            println "MAVEN_NAME = ${MAVEN_NAME}"
+            println "MAVEN_EMAIL = ${MAVEN_EMAIL}"
+            println "MAVEN_PASSWORD = ${MAVEN_PASSWORD}"
+
+            true
+        } catch (ignored) {
+            false
+        }
+    }
+
+    mavenPublishing = {
+        closure ->
+            if (!tryGetMavenConfigInfo()) {
+                println "未找到Maven配置文件，跳过发布流程"
+                return
+            }
+
+            def publishing = new MavenPublishing()
+
+            closure.resolveStrategy = Closure.DELEGATE_FIRST
+            closure.delegate = publishing
+            closure(publishing)
+
+            publishingProject(publishing)
+    }
+
+    publishingProject = {
+        publishing ->
+            def year = new Date().format("yyyy")
+
+            project.publishing {
+                publications {
+                    maven(MavenPublication) {
+                        groupId publishing.groupId
+                        artifactId publishing.artifactId
+                        version publishing.version
+
+                        pom {
+                            name = publishing.artifactId
+                            description = publishing.artifactId
+                            url = publishing.projectUrl
+                            inceptionYear = year
+
+                            licenses {
+                                license {
+                                    name = 'The Apache License, Version 2.0'
+                                    url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                                }
+                            }
+
+                            developers {
+                                developer {
+                                    id = MAVEN_ID
+                                    name = MAVEN_NAME
+                                    email = MAVEN_EMAIL
+                                }
+                            }
+
+                            scm {
+                                url = publishing.projectUrl
+                                connection = "scm:git@${publishing.projectUrl}.git"
+                                developerConnection = "scm:git@${publishing.projectUrl}.git"
+                            }
+                        }
+
+                        artifact "${rootProject.rootDir}/maven/aar/${artifactId}.aar"
+                    }
+                }
+
+                repositories {
+                    maven {
+                        url = MAVEN_URL
+                        credentials {
+                            username MAVEN_NAME
+                            password MAVEN_PASSWORD
+                        }
+                    }
+                }
+            }
+
+            project.signing {
+                sign project.publishing.publications.maven
+            }
+    }
+}
+
+class MavenPublishing {
+    String groupId
+
+    String artifactId
+
+    String version
+
+    String projectUrl
+
+
+    void group(String groupId) {
+        this.groupId = groupId
+    }
+
+    void name(String artifactId) {
+        this.artifactId = artifactId
+    }
+
+    void version(String version) {
+        this.version = version
+    }
+
+    void url(String projectUrl) {
+        this.projectUrl = projectUrl
+    }
+
+    @Override
+    String toString() {
+        return "groupId=${groupId}\n" +
+                "artifactId=${artifactId}\\n" +
+                "version=${version}\n" +
+                "projectUrl= ${projectUrl}\n"
+    }
+}
