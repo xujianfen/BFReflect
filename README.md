@@ -6,6 +6,22 @@ PS：由于BFReflect还处于测试阶段并且部分功能尚未完善，若想
 
 
 
+## 如何获取
+
+最新版本可在[Maven Central](https://central.sonatype.com/artifact/io.github.xujianfen.pram/reflect/1.0.0/versions)上获得。
+
+```gradle
+implementation 'io.github.xujianfen.pram:reflect:1.0.0'
+```
+
+依赖成功后，可以在代码中导入BFReflect。
+
+```java
+import blue.fen.reflect.BFReflect;
+```
+
+
+
 ## 功能介绍
 
 ### 1. 三大反射API
